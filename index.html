@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamZone - Lives</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a28;
+    --border: #2a2a40;
+    --accent: #7c5cfc;
+    --accent2: #fc5c7d;
+    --cyan: #5cf0fc;
+    --text: #e8e8f0;
+    --muted: #6a6a88;
+    --game: #7c5cfc;
+    --irl: #fc8c5c;
+    --special: #5cf0fc;
+    --off: #3a3a55;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG GRID */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NOISE OVERLAY */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .wrap { position: relative; z-index: 1; }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(252,92,125,0.1);
+    border: 1px solid rgba(252,92,125,0.3);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: pulse 1.4s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    padding: 64px 48px 40px;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+  }
+
+  .hero-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.8;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    line-height: 0.9;
+    color: var(--text);
+    letter-spacing: 2px;
+  }
+
+  .hero-title span {
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* STREAM SECTION */
+  .stream-section {
+    padding: 0 48px 64px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .stream-player {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 0 60px rgba(124,92,252,0.15);
+    position: relative;
+  }
+
+  .stream-player::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 17px;
+    background: linear-gradient(135deg, rgba(124,92,252,0.4), transparent 60%);
+    z-index: -1;
+  }
+
+  .stream-player Lathael_Live {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+    border: none;
+  }
+
+  .stream-info {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+  }
+
+  .stream-meta { display: flex; flex-direction: column; gap: 4px; }
+  .stream-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 1px; }
+  .stream-sub { font-size: 0.8rem; color: var(--muted); }
+
+  .viewer-count {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--accent2);
+    font-weight: 600;
+    background: rgba(252,92,125,0.08);
+    border: 1px solid rgba(252,92,125,0.2);
+    padding: 8px 14px;
+    border-radius: 8px;
+  }
+
+  /* CHAT EMBED */
+  .chat-container {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    height: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .chat-header::before {
+    content: '';
+    display: block;
+    width: 6px; height: 6px;
+    background: var(--cyan);
+    border-radius: 50%;
+  }
+
+  .chat-container Lathael_Live {
+    flex: 1;
+    border: none;
+    width: 100%;
+    height: 100%;
+    min-height: 460px;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    padding: 0 48px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .section-divider h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 3px;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* PROGRAMME GRID */
+  .programme-section { padding: 0 48px 80px; }
+
+  .programme-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+
+  .day-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124,92,252,0.4);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+
+  .day-card.today {
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(124,92,252,0.2);
+  }
+
+  .day-card.today::before {
+    content: 'AUJOURD\'HUI';
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--accent);
+    color: white;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    z-index: 10;
+  }
+
+  /* IMAGE DROP ZONE */
+  .image-drop-zone {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    background: var(--surface2);
+    cursor: pointer;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+
+  .image-drop-zone.dragging {
+    background: rgba(124,92,252,0.15);
+    outline: 2px dashed var(--accent);
+    outline-offset: -4px;
+  }
+
+  .drop-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted);
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .drop-placeholder svg {
+    width: 32px; height: 32px;
+    opacity: 0.5;
+  }
+
+  .drop-placeholder span {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+  }
+
+  .drop-placeholder .drop-hint {
+    font-size: 0.65rem;
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .image-drop-zone img.preview {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+
+  .image-drop-zone.has-image img.preview { display: block; }
+  .image-drop-zone.has-image .drop-placeholder { opacity: 0; }
+
+  .remove-img-btn {
+    position: absolute;
+    top: 8px; left: 8px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: white;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: none;
+    transition: background 0.2s;
+    z-index: 5;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+  }
+
+  .remove-img-btn:hover { background: rgba(252,92,125,0.8); }
+  .image-drop-zone.has-image .remove-img-btn { display: block; }
+
+  .image-drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+  }
+
+  .image-drop-zone.has-image input[type="file"] {
+    display: none;
+  }
+
+  /* DAY CARD BODY */
+  .day-body {
+    padding: 16px 18px 18px;
+  }
+
+  .day-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .day-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    color: var(--text);
+  }
+
+  .day-date {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .day-tag {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .tag-game { background: rgba(124,92,252,0.15); color: var(--game); border: 1px solid rgba(124,92,252,0.3); }
+  .tag-irl { background: rgba(252,140,92,0.15); color: var(--irl); border: 1px solid rgba(252,140,92,0.3); }
+  .tag-special { background: rgba(92,240,252,0.1); color: var(--special); border: 1px solid rgba(92,240,252,0.25); }
+  .tag-off { background: rgba(58,58,85,0.3); color: var(--off); border: 1px solid var(--off); }
+
+  .day-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .day-time {
+    font-size: 0.8rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .day-time svg {
+    width: 12px; height: 12px;
+    flex-shrink: 0;
+  }
+
+  .day-off-text {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    color: var(--muted);
+    opacity: 0.5;
+  }
+
+  /* SCROLL ANIMATION */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: fadeUp 0.6s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.1s; }
+  .fade-in:nth-child(3) { animation-delay: 0.15s; }
+  .fade-in:nth-child(4) { animation-delay: 0.2s; }
+  .fade-in:nth-child(5) { animation-delay: 0.25s; }
+  .fade-in:nth-child(6) { animation-delay: 0.3s; }
+  .fade-in:nth-child(7) { animation-delay: 0.35s; }
+
+  @media (max-width: 900px) {
+    header { padding: 16px 20px; }
+    .nav-links { display: none; }
+    .hero { padding: 40px 20px 24px; }
+    .stream-section { padding: 0 20px 40px; grid-template-columns: 1fr; }
+    .chat-container { min-height: 380px; }
+    .chat-container Lathael_Live { min-height: 340px; }
+    .section-divider { padding: 0 20px; }
+    .programme-section { padding: 0 20px 60px; }
+    footer { padding: 24px 20px; flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">StreamZone</div>
+    <nav class="nav-links">
+      <a href="#">Accueil</a>
+      <a href="#">Programme</a>
+      <a href="#">VODs</a>
+    </nav>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      EN DIRECT
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-label">Bienvenue sur ma chaine</div>
+    <h1 class="hero-title">REGARDEZ<br>LE <span>LIVE</span></h1>
+  </section>
+
+  <!-- STREAM + CHAT -->
+  <section class="stream-section">
+    <div class="stream-player">
+      <!-- Remplace Lathael_Live par ton pseudo Twitch -->
+      <Lathael_Live
+        src="https://player.twitch.tv/?channel=Lathael_Live&parent=localhost"
+        allowfullscreen>
+      </Lathael_Live>
+      <div class="stream-info">
+        <div class="stream-meta">
+          <div class="stream-name">Lathael_Live</div>
+          <div class="stream-sub">Twitch.tv/Lathael_Live</div>
+        </div>
+        <div class="viewer-count">
+          <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14">
+            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm5 5c0 1-1 1-1 1H4s-1 0-1-1 1-4 5-4 5 3 5 4Z"/>
+          </svg>
+          EN LIVE
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="chat-container">
+      <div class="chat-header">Chat en direct</div>
+      <!-- Remplace Lathael_Live par ton pseudo Twitch -->
+      <Lathael_Live
+        src="https://www.twitch.tv/embed/Lathael_Live/chat?parent=localhost&darkpopout"
+        >
+      </Lathael_Live>
+    </div>
+  </section>
+
+  <!-- PROGRAMME -->
+  <div class="section-divider">
+    <h2>PROGRAMME DE LA SEMAINE</h2>
+    <div class="divider-line"></div>
+  </div>
+
+  <section class="programme-section">
+    <div class="programme-grid" id="programmeGrid"></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">StreamZone</div>
+    <div class="footer-links">
+      <a href="https://twitch.tv/Lathael_Live" target="_blank">Twitch</a>
+      <a href="https://discord.gg/TvpsKdGq" target="_blank">Discord</a>
+    </div>
+    <div class="footer-copy">2026 - StreamZone. Tous droits reserves.</div>
+  </footer>
+
+</div>
+
+<script>
+  // ========== PROGRAMME (PERSONNALISABLE) ==========
+  const PROGRAMME = [
+    { jour: 'Lundi',    tag: 'game',    titre: 'Session Ranked',     heure: '20h00 - 23h00' },
+    { jour: 'Mardi',    tag: 'off',     titre: 'Pas de live',        heure: '' },
+    { jour: 'Mercredi', tag: 'game',    titre: 'Discovery Game',     heure: '19h00 - 22h00' },
+    { jour: 'Jeudi',    tag: 'irl',     titre: 'Vibe & Discussion',  heure: '21h00 - 23h30' },
+    { jour: 'Vendredi', tag: 'special', titre: 'Event Special',      heure: '20h00 - 00h00' },
+    { jour: 'Samedi',   tag: 'game',    titre: 'Marathon Gaming',    heure: '18h00 - 02h00' },
+    { jour: 'Dimanche', tag: 'game',    titre: 'Chill & Co-stream',  heure: '17h00 - 21h00' },
+  ];
+
+  const TAG_LABELS = {
+    game: 'Gaming',
+    irl: 'IRL',
+    special: 'Special',
+    off: 'Off',
+  };
+
+  // Trouver le jour actuel (0=Dimanche, 1=Lundi...)
+  const JOURS_INDEX = { 'Dimanche':0,'Lundi':1,'Mardi':2,'Mercredi':3,'Jeudi':4,'Vendredi':5,'Samedi':6 };
+  const todayIndex = new Date().getDay();
+
+  function buildProgramme() {
+    const grid = document.getElementById('programmeGrid');
+    grid.innerHTML = '';
+
+    PROGRAMME.forEach((item, i) => {
+      const isToday = JOURS_INDEX[item.jour] === todayIndex;
+      const card = document.createElement('div');
+      card.className = 'day-card fade-in' + (isToday ? ' today' : '');
+
+      card.innerHTML = `
+        <!-- ZONE GLISSER-DEPOSER IMAGE -->
+        <div class="image-drop-zone" id="dropzone-${i}">
+          <input type="file" accept="image/*" onchange="handleFileSelect(event, ${i})" title="Choisir une image">
+          <div class="drop-placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3 21h18a.75.75 0 00.75-.75V6.75A2.25 2.25 0 0019.5 4.5h-15A2.25 2.25 0 002.25 6.75v13.5c0 .414.336.75.75.75z"/>
+            </svg>
+            <span>Glisser une image<br>ou cliquer pour choisir</span>
+            <span class="drop-hint">Illustration du jeu prevu</span>
+          </div>
+          <img class="preview" id="preview-${i}" src="" alt="Apercu du jeu">
+          <button class="remove-img-btn" onclick="removeImage(event, ${i})">Supprimer</button>
+        </div>
+
+        <!-- CORPS DE LA CARTE -->
+        <div class="day-body">
+          <div class="day-header">
+            <div>
+              <div class="day-name">${item.jour}</div>
+            </div>
+            <span class="day-tag tag-${item.tag}">${TAG_LABELS[item.tag]}</span>
+          </div>
+          ${item.tag !== 'off'
+            ? `<div class="day-title">${item.titre}</div>
+               <div class="day-time">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                   <circle cx="12" cy="12" r="10"/>
+                   <polyline points="12 6 12 12 16 14"/>
+                 </svg>
+                 ${item.heure}
+               </div>`
+            : `<div class="day-off-text">${item.titre}</div>`
+          }
+        </div>
+      `;
+
+      // Evenements drag & drop
+      const zone = card.querySelector(`#dropzone-${i}`);
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragging');
+      });
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('dragging');
+      });
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragging');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          loadImageToZone(file, i);
+        }
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  function handleFileSelect(event, index) {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      loadImageToZone(file, index);
+    }
+  }
+
+  function loadImageToZone(file, index) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const zone = document.getElementById(`dropzone-${index}`);
+      const preview = document.getElementById(`preview-${index}`);
+      preview.src = e.target.result;
+      zone.classList.add('has-image');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeImage(event, index) {
+    event.stopPropagation();
+    const zone = document.getElementById(`dropzone-${index}`);
+    const preview = document.getElementById(`preview-${index}`);
+    preview.src = '';
+    zone.classList.remove('has-image');
+    // Reinitialiser l'input file
+    const input = zone.querySelector('input[type="file"]');
+    if (input) input.value = '';
+  }
+
+  buildProgramme();
+</script>
+</body>
+</html>
